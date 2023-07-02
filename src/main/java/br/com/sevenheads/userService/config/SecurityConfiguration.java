@@ -28,7 +28,9 @@ public class SecurityConfiguration {
         		.disable()
                 .authorizeHttpRequests(
                 		authorizeConfig -> {
-                			authorizeConfig.requestMatchers("/api/v1/auth/**").permitAll();
+                			authorizeConfig.requestMatchers("/swagger-ui.html").permitAll();
+                			authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
+                			authorizeConfig.requestMatchers("/v1/api/auth/**").permitAll();                			                			
                 			authorizeConfig.requestMatchers("/server/**").permitAll();
                 			authorizeConfig.requestMatchers("/logout").permitAll();
                 			authorizeConfig.anyRequest().authenticated();                			                			

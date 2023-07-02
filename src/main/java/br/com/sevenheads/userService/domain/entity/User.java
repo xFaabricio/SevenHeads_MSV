@@ -11,9 +11,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -101,10 +104,11 @@ public class User implements Serializable, UserDetails {
 	@Column
 	private UUID idApi;
 	
-	@ManyToMany(cascade = CascadeType.MERGE)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
 	@JoinTable(name = "sh_user_roles",
 			joinColumns= {@JoinColumn(name="user_id", referencedColumnName = "id")},
 			inverseJoinColumns = {@JoinColumn(name="role_id", referencedColumnName = "id")})
+	@JsonBackReference
 	private List<Role> roles;
 	
 	@Column(name="id_user_update")
@@ -112,10 +116,12 @@ public class User implements Serializable, UserDetails {
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {		
-		List<SimpleGrantedAuthority> roles = new ArrayList<>();		
-		for(Role role : this.roles) {
-			roles.add(new SimpleGrantedAuthority(role.getKey()));
-		}		
+		List<SimpleGrantedAuthority> roles = new ArrayList<>();
+		if(this.roles != null && !this.roles.isEmpty()) {
+			for(Role role : this.roles) {
+				roles.add(new SimpleGrantedAuthority(role.getKey()));
+			}
+		}
 		return roles;
 	}
 
