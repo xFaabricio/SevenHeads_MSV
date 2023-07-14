@@ -23,6 +23,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +41,8 @@ public class User implements Serializable, UserDetails {
 	private static final long serialVersionUID = -4587481838374402425L;	
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sh_user_SEQ")
+	@SequenceGenerator(name = "sh_user_SEQ", sequenceName = "sh_user_SEQ", allocationSize = 1)
 	private Long id;
 	
 	@Column(name="name")

@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
@@ -19,8 +20,9 @@ public class Role implements Serializable {
 	
 	private static final long serialVersionUID = 5495299185498051285L;
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Id	
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sh_role_SEQ")
+	@SequenceGenerator(name = "sh_role_SEQ", sequenceName = "sh_role_SEQ", allocationSize = 1)
 	private Long id;
 	
 	@Column(name="key")
