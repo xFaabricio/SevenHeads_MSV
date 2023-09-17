@@ -52,9 +52,11 @@ public class FormServiceController {
             String value = entry.getValue();            
             
             if(keyForm.equals("e-mail") || keyForm.equals("email")) {
-            	message.append(" Encontrado e-mail no formulario: " + value);
-            	formServiceHistory.setSendMessage(true);
-            	requesterEmail = value;
+            	if(value != null && !value.equals("")) {
+	            	message.append(" Encontrado e-mail no formulario: " + value);
+	            	formServiceHistory.setSendMessage(true);
+	            	requesterEmail = value;
+            	}
             }                       
         }
 		
@@ -77,7 +79,9 @@ public class FormServiceController {
 			emailService.sendEmailFormServiceRequester(requesterEmail);
 		}
 		
-		emailService.sendEmailFormServiceOwner(user.getEmail(), user.getLogin(), formData);
+		if(Boolean.TRUE.equals(formService.getSendMessage())) {
+			emailService.sendEmailFormServiceOwner(user.getEmail(), user.getLogin(), formData);
+		}
 		
 		return environment.getProperty("successTemplate");
 	}	
