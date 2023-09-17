@@ -1,4 +1,4 @@
-package br.com.sevenheads.userService.authentication;
+package br.com.sevenheads.userService.authentication.api.v1;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponse {
+public class AuthenticationRequest {
 
-	private String token;
+	private String login;
+	
+	private String password;
 	
 }

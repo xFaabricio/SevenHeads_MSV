@@ -1,4 +1,4 @@
-package br.com.sevenheads.userService.authentication;
+package br.com.sevenheads.userService.authentication.api.v1;
 
 import java.util.Arrays;
 
