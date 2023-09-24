@@ -1,25 +1,19 @@
 package br.com.sevenheads.userService.domain.formservice.api.v1;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
-
-import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import br.com.sevenheads.userService.domain.entity.FormService;
 import br.com.sevenheads.userService.domain.entity.FormServiceHistory;
 import br.com.sevenheads.userService.domain.entity.User;
 import br.com.sevenheads.userService.utility.EmailService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/v1/formService")
@@ -29,10 +23,10 @@ public class FormServiceController {
 
 	private final FormServiceApi formServiceApi;
 	
-	private final Environment environment;
-	
 	private final EmailService emailService;
-	
+
+	private final TemplateEngine templateEngine;
+
 	@PostMapping("/{uuid}")
 	public String sendMessages(@PathVariable("uuid") String uuid, @RequestParam Map<String, String> formData){
 		FormService formService = formServiceApi.findById(UUID.fromString(uuid));
@@ -82,7 +76,54 @@ public class FormServiceController {
 		if(Boolean.TRUE.equals(formService.getSendMessage())) {
 			emailService.sendEmailFormServiceOwner(user.getEmail(), user.getLogin(), formData);
 		}
-		
-		return environment.getProperty("successTemplate");
-	}	
+
+		Context context = new Context();
+
+		return templateEngine.process("success", context);
+	}
+
+	@GetMapping("/test/{key}")
+	public String test(@PathVariable("key") String key) {
+		Context context = new Context();
+
+        switch (key) {
+            case "templateForgot" -> {
+                context.setVariable("name", "Fabricio");
+                context.setVariable("newPassword", "Pass123");
+                return templateEngine.process("forgot", context);
+            }
+            case "templateOwner" -> {
+				String content = getContent();
+				context.setVariable("login", "MASTER");
+                context.setVariable("content", content);
+                return templateEngine.process("owner", context);
+            }
+            case "templateRequester" -> {
+                return templateEngine.process("requester", context);
+            }
+            case "templateWelcome" -> {
+                context.setVariable("name", "Oliveira");
+                return templateEngine.process("welcome", context);
+            }
+			default -> {
+				return templateEngine.process("success", context);
+			}
+        }
+	}
+
+	private static String getContent() {
+		String content = "";
+		content += "<p style=\"margin: 0; font-size: 14px; text-align: left; mso-line-height-alt: 28px; font-weight: bold;\">";
+		content += "Name" + ":";
+		content += "</p> <p style=\"margin: 0; font-size: 14px; text-align: left; mso-line-height-alt: 28px;\">";
+		content += "Fabrício";
+		content += "</p> <br>";
+		content += "<p style=\"margin: 0; font-size: 14px; text-align: left; mso-line-height-alt: 28px; font-weight: bold;\">";
+		content += "keyForm" + ":";
+		content += "</p> <p style=\"margin: 0; font-size: 14px; text-align: left; mso-line-height-alt: 28px;\">";
+		content += "value";
+		content += "</p> <br>";
+		return content;
+	}
+
 }
