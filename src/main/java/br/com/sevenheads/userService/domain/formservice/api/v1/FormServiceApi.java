@@ -1,5 +1,7 @@
 package br.com.sevenheads.userService.domain.formservice.api.v1;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -42,4 +44,30 @@ public class FormServiceApi {
 	public FormServiceHistory saveFormServiceHistory(FormServiceHistory formServiceHistory) {
 		return formServiceHistoryRepository.save(formServiceHistory);
 	}
+
+	public String findRequesterEmail(Map<String, String> data) {
+		for (Map.Entry<String, String> entry : data.entrySet()) {
+			String keyForm = entry.getKey();
+			String value = entry.getValue();
+
+			if (keyForm.equals("e-mail") || keyForm.equals("email") && (value != null && !value.equals(""))) {
+				return value;
+			}
+		}
+		return null;
+	}
+
+	public boolean alreadySend(String jsonData, FormService formService){
+		Optional<List<FormServiceHistory>> formServiceHistory = formServiceHistoryRepository.findFormServiceHistoriesByUuidFormServiceOrderByCreateDateDesc(formService.getId());
+
+		if(formServiceHistory.isPresent()){
+			for(FormServiceHistory fsHistory : formServiceHistory.get()){
+				if(fsHistory.getMessage().equals(jsonData)){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 }
