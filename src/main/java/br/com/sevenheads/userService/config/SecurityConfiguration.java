@@ -28,45 +28,39 @@ public class SecurityConfiguration {
 	
 	@SuppressWarnings("removal")
 	@Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-        		.cors()
-        		.and()
-        		.csrf()
-        		.disable()
-                .authorizeHttpRequests(
-                		authorizeConfig -> {
-                			authorizeConfig.requestMatchers("/swagger-ui.html").permitAll();
-                			authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
-                			authorizeConfig.requestMatchers("/v1/api/auth/**").permitAll();
-                			authorizeConfig.requestMatchers("/v1/formService/**").permitAll();
-                			authorizeConfig.requestMatchers("/server/**").permitAll();
-                			authorizeConfig.requestMatchers("/logout").permitAll();
-                			authorizeConfig.anyRequest().authenticated();                			                			
-                		})
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)                
-                .build();
-    }
-	
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		return http
+				.cors()
+				.and()
+				.csrf()
+				.disable()
+				.authorizeHttpRequests(authorizeConfig -> {
+					authorizeConfig.requestMatchers("/swagger-ui.html").permitAll();
+					authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
+					authorizeConfig.requestMatchers("/v1/api/auth/**").permitAll();
+					authorizeConfig.requestMatchers("/v1/formService/**").permitAll();
+					authorizeConfig.requestMatchers("/server/**").permitAll();
+					authorizeConfig.requestMatchers("/logout").permitAll();
+					authorizeConfig.anyRequest().authenticated();
+				})
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				.and()
+				.authenticationProvider(authenticationProvider)
+				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+				.build();
+	}
+
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowCredentials(false);
 		configuration.setAllowedOrigins(Arrays.asList("*"));
-		configuration.setAllowedMethods(Arrays.asList("*"));
-		configuration.setAllowedHeaders(Arrays.asList("*"));
-		configuration.addAllowedMethod(HttpMethod.OPTIONS);
-		configuration.addAllowedMethod(HttpMethod.GET);
-		configuration.addAllowedMethod(HttpMethod.POST);
-		configuration.addAllowedMethod(HttpMethod.PUT);
-		configuration.addAllowedMethod(HttpMethod.DELETE);
-		configuration.addExposedHeader("Authorization");
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+		configuration.setExposedHeaders(Arrays.asList("Authorization"));
+		configuration.setAllowCredentials(true);
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
 	}
 
 }
