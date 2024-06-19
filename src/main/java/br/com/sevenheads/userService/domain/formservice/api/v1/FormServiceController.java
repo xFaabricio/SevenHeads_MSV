@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import javax.mail.MessagingException;
 import java.util.*;
 
 @RestController
@@ -123,6 +124,13 @@ public class FormServiceController {
 		}
 
 		return null;
+	}
+
+	@Hidden
+	@GetMapping("/test/sendEmail")
+	public String testSendEmail() throws MessagingException {
+		emailService.sendEmail("fabricio_oliveira1@hotmail.com", "SevenHeads", "Apenas um teste", false);
+		return "OK";
 	}
 
 	@Hidden
