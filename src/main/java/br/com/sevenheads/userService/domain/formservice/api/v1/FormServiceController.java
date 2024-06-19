@@ -127,13 +127,6 @@ public class FormServiceController {
 	}
 
 	@Hidden
-	@GetMapping("/test/sendEmail")
-	public String testSendEmail() throws MessagingException {
-		emailService.sendEmail("fabricio_oliveira1@hotmail.com", "SevenHeads", "Apenas um teste", false);
-		return "OK";
-	}
-
-	@Hidden
 	@GetMapping("/test/{key}")
 	public String test(@PathVariable("key") String key) {
 		Context context = new Context();
