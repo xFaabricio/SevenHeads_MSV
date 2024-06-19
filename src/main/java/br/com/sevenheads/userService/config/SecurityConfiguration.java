@@ -34,7 +34,7 @@ public class SecurityConfiguration {
 				.and()
 				.csrf()
 				.disable()
-				.authorizeHttpRequests(authorizeConfig -> {
+				/*.authorizeHttpRequests(authorizeConfig -> {
 					authorizeConfig.requestMatchers("/swagger-ui.html").permitAll();
 					authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
 					authorizeConfig.requestMatchers("/v1/api/auth/**").permitAll();
@@ -46,7 +46,7 @@ public class SecurityConfiguration {
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and()
 				.authenticationProvider(authenticationProvider)
-				//.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)*/
 				.build();
 	}
 
