@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping(value = "/v1/user")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class UserController {
 	

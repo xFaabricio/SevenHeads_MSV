@@ -36,7 +36,6 @@ public class SecurityConfiguration {
                 			authorizeConfig.requestMatchers("/swagger-ui.html").permitAll();
                 			authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
                 			authorizeConfig.requestMatchers("/v1/api/auth/**").permitAll();
-							authorizeConfig.requestMatchers("/v1/api/auth/authenticate").permitAll();
                 			authorizeConfig.requestMatchers("/v1/formService/**").permitAll();
                 			authorizeConfig.requestMatchers("/server/**").permitAll();
                 			authorizeConfig.requestMatchers("/logout").permitAll();
