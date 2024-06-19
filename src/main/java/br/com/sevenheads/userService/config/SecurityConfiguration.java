@@ -3,12 +3,8 @@ package br.com.sevenheads.userService.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,7 +18,6 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfiguration {
 	
 	@Autowired
@@ -30,9 +25,6 @@ public class SecurityConfiguration {
 	
 	@Autowired
 	private AuthenticationProvider authenticationProvider;
-
-	public String crossOriginAllowedHeaders="header1,header2, *" ;
-	public String crossOriginAllowedSites="site1,site2, * ";
 
 	@SuppressWarnings("removal")
 	@Bean
@@ -53,32 +45,19 @@ public class SecurityConfiguration {
 				})
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and()
-				.headers()
-				.frameOptions()
-				.sameOrigin().addHeaderWriter((request,response)->{
-					response.setHeader("Cache-Control","no-cache, no-store, max-age=0, must-revalidate, private");
-					response.setHeader("Pragma","no-cache");
-					response.setHeader("Access-Control-Allow-Origin",this.crossOriginAllowedSites);
-				})
-				.and()
 				.authenticationProvider(authenticationProvider)
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();
 	}
 
 	@Bean
-	@Order(Ordered.HIGHEST_PRECEDENCE)
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowCredentials(false);
-		configuration.setAllowedHeaders(Arrays.asList(crossOriginAllowedHeaders.split(",")));
-		configuration.setAllowedOrigins(Arrays.asList(crossOriginAllowedSites.split(",")));
-		configuration.addAllowedMethod(HttpMethod.OPTIONS);
-		configuration.addAllowedMethod(HttpMethod.GET);
-		configuration.addAllowedMethod(HttpMethod.POST);
-		configuration.addAllowedMethod(HttpMethod.PUT);
-		configuration.addAllowedMethod(HttpMethod.DELETE);
-		configuration.addExposedHeader("Authorization");
+		configuration.setMaxAge(Long.MAX_VALUE);
+		configuration.setAllowCredentials(true);
+		configuration.addAllowedHeader("*");
+		configuration.addAllowedOrigin("*");
+		configuration.addAllowedMethod("*");
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
