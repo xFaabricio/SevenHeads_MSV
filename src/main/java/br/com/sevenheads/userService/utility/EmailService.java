@@ -52,21 +52,13 @@ public class EmailService {
             // trate exceções aqui
         }
     }
-	
-	public void sendEmailWelcomeDebug(String to, String name) throws MessagingException {
-		sendEmailHtml(to, name, true, false, null, true);
-	}
-	
-	public void sendEmailForgotDebug(String to, String name, String newPassword) throws MessagingException {
-		sendEmailHtml(to, name, false, true, newPassword, true);
-	}
-	
+
 	public void sendEmailWelcome(String to, String name) throws MessagingException {
-		sendEmailHtml(to, name, true, false, null, false);
+		sendEmailHtml(to, name, true, false, null);
 	}
 	
 	public void sendEmailForgot(String to, String name, String newPassword) throws MessagingException {
-		sendEmailHtml(to, name, false, true, newPassword, false);
+		sendEmailHtml(to, name, false, true, newPassword);
 	}
 	
 	public void sendEmailFormServiceOwner(String to, String login, Map<String, String> formData) {
@@ -157,27 +149,20 @@ public class EmailService {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public void sendEmailHtml(String to, String name, boolean welcome, boolean forgotPassword, String newPassword, boolean debugTest) throws MessagingException {
+	public void sendEmailHtml(String to, String name, boolean welcome, boolean forgotPassword, String newPassword) throws MessagingException {
         try {        	
         	String host;
             String port;
             String username;
             String password;
             String mailFrom;
-        	
-        	if(!debugTest) {	            	
-	            host = environment.getProperty("mail.host");
-	            port = environment.getProperty("mail.port");
-	            username = environment.getProperty("mail.username");
-	            password = environment.getProperty("mail.password");
-	            mailFrom = environment.getProperty("mail.from");
-        	}else {
-        		host = "smtp.zoho.com";
-	            port = "587";
-	            username = "suporte@sevenheads.com.br";
-	            password = "wnrtmihtl0912-A!";
-	            mailFrom = "suporte@sevenheads.com.br";
-        	}
+
+			host = environment.getProperty("mail.host");
+			port = environment.getProperty("mail.port");
+			username = environment.getProperty("mail.username");
+			password = environment.getProperty("mail.password");
+			mailFrom = environment.getProperty("mail.from");
+
         	String body = null;
         	
         	if(welcome) {
