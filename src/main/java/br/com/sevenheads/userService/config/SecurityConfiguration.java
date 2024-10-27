@@ -32,6 +32,9 @@ public class SecurityConfiguration {
 	@Autowired
 	private AuthenticationProvider authenticationProvider;
 
+	public String crossOriginAllowedHeaders="*" ;
+	public String crossOriginAllowedSites="*";
+
 	@SuppressWarnings("removal")
 	@Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -56,7 +59,7 @@ public class SecurityConfiguration {
 				.sameOrigin().addHeaderWriter((request,response)->{
 					response.setHeader("Cache-Control","no-cache, no-store, max-age=0, must-revalidate, private");
 					response.setHeader("Pragma","no-cache");
-					response.setHeader("Access-Control-Allow-Origin", "*");
+					response.setHeader("Access-Control-Allow-Origin",this.crossOriginAllowedSites);
 				})
 				.and()
                 .authenticationProvider(authenticationProvider)
@@ -85,8 +88,8 @@ public class SecurityConfiguration {
 		config.setAllowCredentials(false);
 		config.setAllowedHeaders(Arrays.asList(crossOriginAllowedHeaders.split(",")));
 		config.setAllowedOrigins(Arrays.asList(crossOriginAllowedSites.split(",")));
-		config.setAllowedHeaders(List.of("*"));
-		config.setAllowedOrigins(List.of("*"));
+		//config.setAllowedHeaders(List.of("*"));
+		//config.setAllowedOrigins(List.of("*"));
 		config.addAllowedMethod(HttpMethod.OPTIONS);
 		config.addAllowedMethod(HttpMethod.GET);
 		config.addAllowedMethod(HttpMethod.POST);
