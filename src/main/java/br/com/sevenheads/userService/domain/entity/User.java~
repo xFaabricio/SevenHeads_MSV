@@ -139,7 +139,7 @@ public class User implements Serializable, UserDetails {
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return blocked == null || !blocked;
+		return !blocked;
 	}
 
 	@Override
