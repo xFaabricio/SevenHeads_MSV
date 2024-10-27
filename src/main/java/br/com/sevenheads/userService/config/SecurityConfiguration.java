@@ -27,55 +27,43 @@ import java.util.List;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfiguration {
-	
+
 	@Autowired
 	private JwtAuthenticationFilter jwtAuthFilter;
-	
+
 	@Autowired
 	private AuthenticationProvider authenticationProvider;
 
-	public String crossOriginAllowedHeaders="*" ;
-	public String crossOriginAllowedSites="*";
-
-	@SuppressWarnings("removal")
 	@Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-        		.cors()
-        		.and()
-        		.csrf().disable()
-                .authorizeHttpRequests(
-                		authorizeConfig -> {
-                			authorizeConfig.requestMatchers("/swagger-ui.html").permitAll();
-                			authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
-                			authorizeConfig.requestMatchers("/v1/api/auth/**").permitAll();
-                			authorizeConfig.requestMatchers("/v1/formService/**").permitAll();
-                			authorizeConfig.requestMatchers("/server/**").permitAll();
-                			authorizeConfig.requestMatchers("/logout").permitAll();
-                			authorizeConfig.anyRequest().authenticated();
-                		})
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-				.headers()
-				.frameOptions()
-				.sameOrigin().addHeaderWriter((request,response)->{
-					response.setHeader("Cache-Control","no-cache, no-store, max-age=0, must-revalidate, private");
-					response.setHeader("Pragma","no-cache");
-					response.setHeader("Access-Control-Allow-Origin",this.crossOriginAllowedSites);
-				})
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		return http
+				.cors()
 				.and()
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+				.csrf().disable()
+				.authorizeHttpRequests(authorizeConfig -> {
+					authorizeConfig.requestMatchers("/swagger-ui.html").permitAll();
+					authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
+					authorizeConfig.requestMatchers("/v1/api/auth/**").permitAll();
+					authorizeConfig.requestMatchers("/v1/formService/**").permitAll();
+					authorizeConfig.requestMatchers("/server/**").permitAll();
+					authorizeConfig.requestMatchers("/logout").permitAll();
+					authorizeConfig.anyRequest().authenticated();
+				})
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				.and()
+				.authenticationProvider(authenticationProvider)
+				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+				.build();
+	}
 
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(List.of("*"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
 		configuration.setAllowCredentials(true);
+		configuration.addExposedHeader("Authorization");
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
@@ -87,28 +75,5 @@ public class SecurityConfiguration {
 		FilterRegistrationBean<ForwardedHeaderFilter> filter = new FilterRegistrationBean<>(new ForwardedHeaderFilter());
 		filter.setOrder(Ordered.HIGHEST_PRECEDENCE);
 		return filter;
-	}
-
-	@Bean
-	@Order(Ordered.HIGHEST_PRECEDENCE)
-	protected CorsFilter crossFilter() {
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowCredentials(false);
-		config.setAllowedHeaders(Arrays.asList(crossOriginAllowedHeaders.split(",")));
-		config.setAllowedOrigins(Arrays.asList(crossOriginAllowedSites.split(",")));
-		//config.setAllowedHeaders(List.of("*"));
-		//config.setAllowedOrigins(List.of("*"));
-		config.addAllowedMethod(HttpMethod.OPTIONS);
-		config.addAllowedMethod(HttpMethod.GET);
-		config.addAllowedMethod(HttpMethod.POST);
-		config.addAllowedMethod(HttpMethod.PUT);
-		config.addAllowedMethod(HttpMethod.DELETE);
-		config.addExposedHeader("Authorization");
-		config.setMaxAge(1800L);
-
-		source.registerCorsConfiguration("/**", config);
-
-		return new CorsFilter(source);
 	}
 }
