@@ -1,4 +1,4 @@
-package br.com.sevenheads.userService.authentication.api.v1;
+package br.com.sevenheads.userService.domain.authentication.api.v1;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
