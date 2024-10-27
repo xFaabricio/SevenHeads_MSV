@@ -32,8 +32,7 @@ public class SecurityConfiguration {
         return http
         		.cors()
         		.and()
-        		.csrf()
-        		.disable()
+        		.csrf().disable()
                 .authorizeHttpRequests(
                 		authorizeConfig -> {
                 			authorizeConfig.requestMatchers("/swagger-ui.html").permitAll();
@@ -46,6 +45,8 @@ public class SecurityConfiguration {
                 		})
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+				.headers().cacheControl().disable()
+				.and()
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
