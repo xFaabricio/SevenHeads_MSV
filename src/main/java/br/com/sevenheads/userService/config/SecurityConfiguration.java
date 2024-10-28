@@ -25,7 +25,6 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfiguration {
 
 	@Autowired
@@ -35,11 +34,9 @@ public class SecurityConfiguration {
 	private AuthenticationProvider authenticationProvider;
 
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
-				.cors()
-				.and()
-				.csrf().disable()
+				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(authorizeConfig -> {
 					authorizeConfig.requestMatchers("/swagger-ui.html").permitAll();
 					authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
@@ -49,12 +46,13 @@ public class SecurityConfiguration {
 					authorizeConfig.requestMatchers("/logout").permitAll();
 					authorizeConfig.anyRequest().authenticated();
 				})
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and()
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Configura a política de sessão
 				.authenticationProvider(authenticationProvider)
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();
 	}
+
+
 
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
