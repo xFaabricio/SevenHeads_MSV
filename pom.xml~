@@ -60,13 +60,7 @@
 		    <artifactId>commons-email</artifactId>
 		    <version>1.5</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-			<version>1.18.1</version>
-		</dependency>
-
+		
 		<dependency>
 		    <groupId>commons-beanutils</groupId>
 		    <artifactId>commons-beanutils</artifactId>

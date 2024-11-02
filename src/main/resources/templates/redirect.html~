@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecionando...</title>
+    <!-- Redireciona automaticamente após 3 segundos para a URL especificada -->
+    <meta http-equiv="refresh" content="3;url=/newPage" th:content="3;url=@{/newPage}"/>
+</head>
+<body>
+<h2>Redirecionando, por favor aguarde...</h2>
+<p>Se você não for redirecionado automaticamente, <a th:href="@{/newPage}">clique aqui</a>.</p>
+</body>
+</html>

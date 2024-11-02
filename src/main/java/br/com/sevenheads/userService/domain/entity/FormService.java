@@ -55,5 +55,17 @@ public class FormService implements Serializable {
 	
 	@Column
 	private Date deletedDate;
+
+	@Column
+	private Boolean useCustomHTML;
+
+	@Column(columnDefinition = "TEXT")
+	private String customHTML;
+
+	@Column
+	private Boolean useCustomRedirect;
+
+	@Column
+	private String customRedirect;
 	
 }

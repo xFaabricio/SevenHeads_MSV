@@ -7,6 +7,7 @@ import br.com.sevenheads.userService.domain.entity.User;
 import br.com.sevenheads.userService.domain.repository.FormServiceHistoryRepository;
 import br.com.sevenheads.userService.domain.repository.UserRepository;
 import br.com.sevenheads.userService.utility.EmailService;
+import br.com.sevenheads.userService.utility.FormatUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -74,6 +75,8 @@ public class FormServiceController {
 		boolean alreadySended = false;
 		Context context = new Context();
 
+		String finalResult = "";
+
 		try {
 			formDataJson = objectMapper.writeValueAsString(formData);
 		} catch (JsonProcessingException e) {
@@ -115,14 +118,27 @@ public class FormServiceController {
 				emailService.sendEmailFormServiceOwner(user.getEmail(), user.getLogin(), formData);
 			}
 
-			return templateEngine.process("success", context);
+			finalResult = templateEngine.process("success", context);
 		}else {
 			if (alreadySended){
-				return templateEngine.process("success-already", context);
+				finalResult = templateEngine.process("success-already", context);
 			}
 		}
 
-		return null;
+		if(formService.getUseCustomHTML() != null && formService.getUseCustomHTML()) {
+			if(FormatUtil.isValidHtml(formService.getCustomHTML())) {
+				finalResult = formService.getCustomHTML();
+			}
+		}
+
+		if(formService.getUseCustomRedirect() != null && formService.getUseCustomRedirect()) {
+			if(FormatUtil.isValidUrl(formService.getCustomRedirect())) {
+				context.setVariable("newPage", formService.getCustomRedirect());
+				finalResult = templateEngine.process("redirect", context);
+			}
+		}
+
+		return finalResult;
 	}
 
 	@Hidden
