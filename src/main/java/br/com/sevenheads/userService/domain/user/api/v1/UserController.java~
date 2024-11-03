@@ -39,16 +39,12 @@ public class UserController {
 		
 		Optional<User> user = userRepository.findByLogin(login);		
 		ObjectMapper objectMapper = new ObjectMapper();
-
-		if(user.isPresent()) {
-			try {
-				return objectMapper.writeValueAsString(user.get());
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-				return "ERROR";
-			}
-		}else{
-			return "NOT_FOUND";
-		}
+		
+		try {
+			return objectMapper.writeValueAsString(user.get());
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return "ERROR";
+		}	
 	}
 }

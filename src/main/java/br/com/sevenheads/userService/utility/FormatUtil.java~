@@ -9,10 +9,6 @@ import java.net.URL;
 
 public final class FormatUtil {
 
-    private FormatUtil() {
-        throw new IllegalStateException("Utility class");
-    }
-
     public static boolean isValidHtml(String html) {
         try {
             Document doc = Jsoup.parse(html, "", Parser.htmlParser());

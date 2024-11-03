@@ -16,8 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import javax.mail.MessagingException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping(value = "/v1/formService")
@@ -35,6 +36,38 @@ public class FormServiceController {
 	private final FormServiceHistoryRepository formServiceHistoryRepository;
 
 	private final JwtService jwtService;
+
+	@GetMapping("/history/emails/{uuid}")
+	public String getFormServiceHistoryEmails(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("uuid") String uuid) throws JsonProcessingException {
+		final String jwtToken;
+		final String login;
+
+		if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+			return "UNAUTHORIZED";
+		}
+
+		jwtToken = authorizationHeader.substring(7);
+		login = jwtService.extractLogin(jwtToken);
+
+		Optional<User> user = userRepository.findByLogin(login);
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<String> emails = new ArrayList<>();
+
+		FormService formService = formServiceApi.findById(UUID.fromString(uuid));
+
+		if(user.isPresent() && formService.getIdUser().equals(user.get().getId())){
+			Optional<List<FormServiceHistory>> formServiceHistoryList = formServiceHistoryRepository.findFormServiceHistoriesByUuidFormServiceOrderByCreateDateDesc(formService.getId());
+			if(formServiceHistoryList.isPresent()){
+				for(FormServiceHistory formServiceHistory : formServiceHistoryList.get()){
+					emails.addAll(emailService.extractEmails(formServiceHistory.getMessage()));
+				}
+			}
+		}else{
+			return "Not found";
+		}
+
+		return objectMapper.writeValueAsString(emails);
+	}
 
 	@GetMapping("/history/{uuid}")
 	public String getFormServiceHistory(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("uuid") String uuid) throws JsonProcessingException {
@@ -125,18 +158,19 @@ public class FormServiceController {
 			}
 		}
 
-		if(formService.getUseCustomHTML() != null && formService.getUseCustomHTML()) {
-			if(FormatUtil.isValidHtml(formService.getCustomHTML())) {
+		try {
+			if (formService.getUseCustomHTML() != null && formService.getUseCustomHTML() && FormatUtil.isValidHtml(formService.getCustomHTML())) {
 				finalResult = formService.getCustomHTML();
 			}
-		}
 
-		if(formService.getUseCustomRedirect() != null && formService.getUseCustomRedirect()) {
-			if(FormatUtil.isValidUrl(formService.getCustomRedirect())) {
+			if (formService.getUseCustomRedirect() != null && formService.getUseCustomRedirect() && FormatUtil.isValidUrl(formService.getCustomRedirect())) {
 				context.setVariable("newPage", formService.getCustomRedirect());
 				finalResult = templateEngine.process("redirect", context);
 			}
+		} catch (IllegalStateException e) {
+			Logger.getLogger(FormServiceController.class.getName()).log(Level.SEVERE, null, e);
 		}
+
 
 		return finalResult;
 	}

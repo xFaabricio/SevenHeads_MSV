@@ -1,14 +1,9 @@
 package br.com.sevenheads.userService.utility;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.mail.MessagingException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
@@ -219,42 +214,5 @@ public class EmailService {
 		context.setVariable("newPassword", newPassword);
 
 		return templateEngine.process("forgot", context);
-	}
-
-	public List<String> extractEmails(String jsonString) {
-		List<String> emailList = new ArrayList<>();
-		ObjectMapper objectMapper = new ObjectMapper();
-
-		try {
-			JsonNode jsonNode = objectMapper.readTree(jsonString);
-
-			String[] emailKeys = {"email", "e-mail", "emails", "e-mails"};
-
-			for (String key : emailKeys) {
-				if (jsonNode.has(key)) {
-					JsonNode valueNode = jsonNode.get(key);
-					if (valueNode.isTextual()) {
-						emailList.add(valueNode.asText());
-					} else if (valueNode.isArray()) {
-						for (JsonNode emailNode : valueNode) {
-							emailList.add(emailNode.asText());
-						}
-					}
-				}
-			}
-
-			Iterator<String> keys = jsonNode.fieldNames();
-			while (keys.hasNext()) {
-				String key = keys.next();
-				if (jsonNode.get(key).isObject()) {
-					emailList.addAll(extractEmails(jsonNode.get(key).toString()));
-				}
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return emailList;
 	}
 }
