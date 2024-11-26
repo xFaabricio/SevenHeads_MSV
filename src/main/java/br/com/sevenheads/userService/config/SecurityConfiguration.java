@@ -37,7 +37,9 @@ public class SecurityConfiguration {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
-				.csrf(csrf -> csrf.disable())
+				.cors()
+				.and()
+				.csrf().disable()
 				.authorizeHttpRequests(authorizeConfig -> {
 					authorizeConfig.requestMatchers("/swagger-ui.html").permitAll();
 					authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
@@ -61,9 +63,11 @@ public class SecurityConfiguration {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOriginPatterns(List.of("*"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		//configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
-		configuration.addAllowedOrigin("*");
-		configuration.addAllowedHeader("*");
+		configuration.setAllowedMethods(
+				Arrays.asList(HttpMethod.DELETE.name(),HttpMethod.GET.name(), HttpMethod.POST.name()));
+		configuration.applyPermitDefaultValues();
+
+
 		configuration.setAllowCredentials(true);
 		configuration.addExposedHeader("Authorization");
 
@@ -78,6 +82,4 @@ public class SecurityConfiguration {
 		filter.setOrder(Ordered.HIGHEST_PRECEDENCE);
 		return filter;
 	}
-
-
 }
