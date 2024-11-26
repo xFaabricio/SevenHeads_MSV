@@ -101,6 +101,9 @@ public class User implements Serializable, UserDetails {
 	
 	@Column(name="agreeTerms")
 	private Boolean agreeTerms;
+
+	@Column(name="profilePhotoId")
+	private String profilePhotoId;
 	
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column
