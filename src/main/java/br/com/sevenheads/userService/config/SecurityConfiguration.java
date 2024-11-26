@@ -35,7 +35,7 @@ public class SecurityConfiguration {
 	private AuthenticationProvider authenticationProvider;
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 				.cors()
 				.and()
@@ -50,24 +50,19 @@ public class SecurityConfiguration {
 					authorizeConfig.requestMatchers("/logout").permitAll();
 					authorizeConfig.anyRequest().authenticated();
 				})
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				.and()
 				.authenticationProvider(authenticationProvider)
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();
 	}
-
-
 
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOriginPatterns(List.of("*"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		configuration.setAllowedMethods(
-				Arrays.asList(HttpMethod.DELETE.name(),HttpMethod.GET.name(), HttpMethod.POST.name()));
-		configuration.applyPermitDefaultValues();
-
-
+		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
 		configuration.setAllowCredentials(true);
 		configuration.addExposedHeader("Authorization");
 
