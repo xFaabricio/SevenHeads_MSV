@@ -35,11 +35,9 @@ public class SecurityConfiguration {
 	private AuthenticationProvider authenticationProvider;
 
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
-				.cors()
-				.and()
-				.csrf().disable()
+				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(authorizeConfig -> {
 					authorizeConfig.requestMatchers("/swagger-ui.html").permitAll();
 					authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
@@ -50,19 +48,24 @@ public class SecurityConfiguration {
 					authorizeConfig.requestMatchers("/logout").permitAll();
 					authorizeConfig.anyRequest().authenticated();
 				})
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and()
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider)
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();
 	}
+
+
 
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOriginPatterns(List.of("*"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
+		configuration.setAllowedMethods(
+				Arrays.asList(HttpMethod.DELETE.name(),HttpMethod.GET.name(), HttpMethod.POST.name()));
+		configuration.applyPermitDefaultValues();
+
+
 		configuration.setAllowCredentials(true);
 		configuration.addExposedHeader("Authorization");
 
@@ -77,4 +80,6 @@ public class SecurityConfiguration {
 		filter.setOrder(Ordered.HIGHEST_PRECEDENCE);
 		return filter;
 	}
+
+
 }
