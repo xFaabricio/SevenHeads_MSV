@@ -25,6 +25,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfiguration {
 
 	@Autowired
@@ -42,8 +43,7 @@ public class SecurityConfiguration {
 					authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
 					authorizeConfig.requestMatchers("/v1/api/auth/**").permitAll();
 					authorizeConfig.requestMatchers("/v1/formService/**").permitAll();
-					authorizeConfig.requestMatchers("/v1/utility/image/IdAPI/**").permitAll();
-					authorizeConfig.requestMatchers("/v1/utility/upload/idAPI/**").permitAll();
+					authorizeConfig.requestMatchers("/v1/utility/**").permitAll();
 					authorizeConfig.requestMatchers("/server/**").permitAll();
 					authorizeConfig.requestMatchers("/logout").permitAll();
 					authorizeConfig.anyRequest().authenticated();
