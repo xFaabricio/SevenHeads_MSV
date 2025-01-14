@@ -1,5 +1,6 @@
 package br.com.sevenheads.userService.domain.entity;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
@@ -24,6 +25,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "sh_form_service")
 public class FormService implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = -6280465386650043243L;
 
 	@Id

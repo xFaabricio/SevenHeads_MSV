@@ -43,6 +43,7 @@ public class SecurityConfiguration {
 					authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
 					authorizeConfig.requestMatchers("/v1/api/auth/**").permitAll();
 					authorizeConfig.requestMatchers("/v1/formService/**").permitAll();
+					authorizeConfig.requestMatchers("/v1/product/**").permitAll();
 					authorizeConfig.requestMatchers("/v1/utility/**").permitAll();
 					authorizeConfig.requestMatchers("/server/**").permitAll();
 					authorizeConfig.requestMatchers("/logout").permitAll();
