@@ -2,10 +2,58 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Redirecionando...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
     <meta http-equiv="refresh" th:content="3 + ';url=' + ${newPage}" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #3c3c3c, #282828);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        p {
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            color: #f0f0f0;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-<h2>Redirecionando em 3 segundos...</h2>
+<div class="container">
+    <h2>Redirecting in 3 seconds...</h2>
+    <div class="spinner"></div>
+    <p>If you are not redirected automatically, <a th:href="@{${newPage}}" style="color: #ffccff;">click here</a>.</p>
+</div>
 </body>
 </html>
