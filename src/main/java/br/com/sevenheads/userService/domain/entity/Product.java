@@ -1,20 +1,18 @@
 package br.com.sevenheads.userService.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Set;
 import java.util.UUID;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "sh_product")
 public class Product implements Serializable {
@@ -61,4 +59,12 @@ public class Product implements Serializable {
     @Column
     private String customRedirect;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "sh_product_category",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    @JsonIgnore // Evita loop na serialização JSON
+    private Set<Category> categories;
 }

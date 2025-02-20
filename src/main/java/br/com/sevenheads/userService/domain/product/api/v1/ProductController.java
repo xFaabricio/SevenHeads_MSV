@@ -1,6 +1,9 @@
 package br.com.sevenheads.userService.domain.product.api.v1;
 
 import br.com.sevenheads.userService.domain.entity.Product;
+import br.com.sevenheads.userService.domain.product.api.v1.response.CategoryResponse;
+import br.com.sevenheads.userService.domain.product.api.v1.response.ProductResponse;
+import br.com.sevenheads.userService.domain.repository.CategoryRepository;
 import br.com.sevenheads.userService.domain.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,8 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/v1/product")
@@ -19,6 +24,8 @@ import java.util.UUID;
 public class ProductController {
 
     private final ProductRepository productRepository;
+
+    private final CategoryRepository categoryRepository;
 
     private final TemplateEngine templateEngine;
 
@@ -68,6 +75,27 @@ public class ProductController {
         }else{
             return "Product not found";
         }
+    }
+
+    @GetMapping("/categories")
+    public List<CategoryResponse> getCategories() {
+        return categoryRepository.findByParentIsNull()
+                .stream()
+                .map(category -> new CategoryResponse(
+                        category.getId(),
+                        category.getName(),
+                        category.getSubcategories() != null ?
+                                category.getSubcategories().stream().map(sub -> new CategoryResponse(sub.getId(), sub.getName(), null)).toList() :
+                                null
+                ))
+                .toList();
+    }
+
+    @GetMapping("/all")
+    public List<ProductResponse> getProducts() {
+        return productRepository.findAll().stream()
+                .map(ProductResponse::new)
+                .collect(Collectors.toList());
     }
 
 }
