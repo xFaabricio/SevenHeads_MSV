@@ -94,6 +94,7 @@ public class UtilityController {
 
                 // Obter o nome do arquivo do header
                 String fileName = response.header("X-Bz-File-Name", "image.jpg"); // Default para "image.jpg" se não houver header
+                fileName = fileName != null ? fileName : "image.jpg"; // Default para "image.jpg" se não houver header
 
                 // Extrair a extensão do arquivo
                 String fileExtension = getFileExtension(fileName);
