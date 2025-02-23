@@ -1,12 +1,11 @@
 package br.com.sevenheads.userService.domain.authentication.api.v1;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/api/auth")
@@ -24,5 +23,10 @@ public class AuthenticationController {
 	public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request){
 		return ResponseEntity.ok(authenticationService.authenticate(request));
 	}
-	
+
+	@PostMapping("/authenticate/{idApi}")
+	public ResponseEntity<AuthenticationResponse> authenticateWithIdApi(@PathVariable("idApi") UUID idApi){
+		return ResponseEntity.ok(authenticationService.authenticateWithIdApi(idApi));
+	}
+
 }

@@ -1,19 +1,19 @@
 package br.com.sevenheads.userService.domain.authentication.api.v1;
 
-import java.util.Arrays;
-import java.util.Optional;
-
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import br.com.sevenheads.userService.config.JwtService;
 import br.com.sevenheads.userService.domain.entity.Role;
 import br.com.sevenheads.userService.domain.entity.User;
 import br.com.sevenheads.userService.domain.repository.RoleRepository;
 import br.com.sevenheads.userService.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +50,16 @@ public class AuthenticationService {
 		}
 		return null;
 	}
-	
+
+	public AuthenticationResponse authenticateWithIdApi(UUID idApi) {
+		var user = userRepository.findByidApi(idApi)
+				.orElseThrow();
+		var jwtToken = jwtService.generateToken(user);
+		return AuthenticationResponse.builder()
+				.token(jwtToken)
+				.build();
+	}
+
 	public AuthenticationResponse authenticate(AuthenticationRequest request) {
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getLogin(), request.getPassword()));
 		var user = userRepository.findByLogin(request.getLogin())
