@@ -7,16 +7,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +28,11 @@ public class UtilityController {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadPhoto(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("file") MultipartFile file) {
         try {
+            // Verifica o tamanho do arquivo
+            if (file.getSize() > 1048576) { // 1MB em bytes
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File size exceeds 1MB limit.");
+            }
+
             String response = backblazeService.uploadPhoto(file.getOriginalFilename(), file.getBytes(), authorizationHeader);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -42,6 +42,11 @@ public class UtilityController {
 
     @PostMapping("/upload/idAPI/{idAPI}")
     public ResponseEntity<String> uploadPhoto(@PathVariable UUID idAPI, @RequestParam("file") MultipartFile file) {
+        // Verifica o tamanho do arquivo
+        if (file.getSize() > 1048576) { // 1MB em bytes
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File size exceeds 1MB limit.");
+        }
+
         Optional<User> user = userRepository.findByidApi(idAPI);
         if(user.isPresent()) {
             try {
@@ -84,15 +89,47 @@ public class UtilityController {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
                 }
 
+                // Obter os bytes da imagem
                 byte[] imageBytes = Objects.requireNonNull(response.body()).bytes();
 
+                // Obter o nome do arquivo do header
+                String fileName = response.header("X-Bz-File-Name", "image.jpg"); // Default para "image.jpg" se não houver header
+
+                // Extrair a extensão do arquivo
+                String fileExtension = getFileExtension(fileName);
+
+                // Definir o tipo de mídia correto
+                MediaType mediaType = getMediaType(fileExtension);
+
+                // Criar os headers da resposta
                 HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.IMAGE_JPEG); // Altere o tipo de mídia conforme necessário
+                headers.setContentType(mediaType);
+                headers.setContentDisposition(ContentDisposition.builder("inline")
+                        .filename(fileName) // Usa o nome real do arquivo
+                        .build());
+
                 return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
             }
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+    private MediaType getMediaType(String fileExtension) {
+        switch (fileExtension.toLowerCase()) {
+            case ".png": return MediaType.IMAGE_PNG;
+            case ".jpg": case ".jpeg": return MediaType.IMAGE_JPEG;
+            case ".gif": return MediaType.IMAGE_GIF;
+            default: return MediaType.APPLICATION_OCTET_STREAM; // Para arquivos desconhecidos
+        }
+    }
+
+    private String getFileExtension(String fileName) {
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex != -1 && lastDotIndex < fileName.length() - 1) {
+            return fileName.substring(lastDotIndex); // Inclui o ponto na extensão, ex: ".png"
+        }
+        return ".jpg"; // Default caso não tenha extensão
     }
 
     @GetMapping("/temporary-link")

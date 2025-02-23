@@ -5,17 +5,11 @@ import br.com.sevenheads.userService.domain.entity.User;
 import br.com.sevenheads.userService.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
-import org.springframework.http.HttpHeaders;
 import org.json.JSONObject;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -101,13 +95,35 @@ public class BackblazeService {
 		String uploadUrl = uploadUrlJson.getString("uploadUrl");
 		String uploadAuthorizationToken = uploadUrlJson.getString("authorizationToken");
 
+		Optional<User> user = Optional.empty();
+
+		if(authorizationHeader != null) {
+			final String jwtToken;
+			final String login;
+
+			if (!authorizationHeader.startsWith("Bearer ")) {
+				return "UNAUTHORIZED";
+			}
+
+			jwtToken = authorizationHeader.substring(7);
+			login = jwtService.extractLogin(jwtToken);
+
+			 user = userRepository.findByLogin(login);
+		} else if (idAPI != null) {
+			user = userRepository.findByidApi(idAPI);
+		}
+
+		if(!user.isPresent()){
+			throw new IOException("User not found");
+		}
+
 		// Passo 2: Faça o upload do arquivo
 		RequestBody fileRequestBody = RequestBody.create(fileContent, MediaType.parse("application/octet-stream"));
 		Request uploadRequest = new Request.Builder()
 				.url(uploadUrl)
 				.post(fileRequestBody)
 				.header("Authorization", uploadAuthorizationToken)
-				.addHeader("X-Bz-File-Name", fileName)
+				.addHeader("X-Bz-File-Name", "users_profile/"+ user.get().getIdApi() + "_" + fileName)
 				.addHeader("Content-Type", "application/octet-stream")
 				.addHeader("X-Bz-Content-Sha1", "do_not_verify")
 				.build();
@@ -124,30 +140,8 @@ public class BackblazeService {
 
 			if (jsonResponse.has("fileId")) {
 				String fileId = jsonResponse.getString("fileId");
-
-				if(authorizationHeader != null) {
-					final String jwtToken;
-					final String login;
-
-					if (!authorizationHeader.startsWith("Bearer ")) {
-						return "UNAUTHORIZED";
-					}
-
-					jwtToken = authorizationHeader.substring(7);
-					login = jwtService.extractLogin(jwtToken);
-
-					Optional<User> user = userRepository.findByLogin(login);
-					if (user.isPresent()) {
-						user.get().setProfilePhotoId(fileId);
-						userRepository.save(user.get());
-					}
-				} else if (idAPI != null) {
-					Optional<User> user = userRepository.findByidApi(idAPI);
-					if (user.isPresent()) {
-						user.get().setProfilePhotoId(fileId);
-						userRepository.save(user.get());
-					}
-				}
+				user.get().setProfilePhotoId(fileId);
+				userRepository.save(user.get());
 			}
 
 			return responseBody; // Retorna o corpo da resposta original

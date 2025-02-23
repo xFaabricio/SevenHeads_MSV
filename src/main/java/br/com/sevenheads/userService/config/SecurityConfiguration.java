@@ -5,7 +5,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -17,7 +16,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
 import java.util.Arrays;
@@ -42,9 +40,9 @@ public class SecurityConfiguration {
 					authorizeConfig.requestMatchers("/swagger-ui.html").permitAll();
 					authorizeConfig.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
 					authorizeConfig.requestMatchers("/v1/api/auth/**").permitAll();
-					authorizeConfig.requestMatchers("/v1/formService/**").permitAll();
 					authorizeConfig.requestMatchers("/v1/product/**").permitAll();
-					authorizeConfig.requestMatchers("/v1/utility/**").permitAll();
+					authorizeConfig.requestMatchers("/v1/utility/image/IdAPI/**").permitAll();
+					authorizeConfig.requestMatchers("/v1/utility/upload/IdAPI/**").permitAll();
 					authorizeConfig.requestMatchers("/server/**").permitAll();
 					authorizeConfig.requestMatchers("/logout").permitAll();
 					authorizeConfig.anyRequest().authenticated();
