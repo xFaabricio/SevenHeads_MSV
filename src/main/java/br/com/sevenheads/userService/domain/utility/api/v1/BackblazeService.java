@@ -23,6 +23,8 @@ public class BackblazeService {
 	private final JwtService jwtService;
 
 	private final UserRepository userRepository;
+
+	//TODO: Usar uma environment variable
 	private static final String B2_API_URL = "https://api.backblazeb2.com";
 
 	public String authorizeAccount() throws IOException {

@@ -2,6 +2,8 @@ package br.com.sevenheads.userService.domain.utility.api.v1;
 
 import br.com.sevenheads.userService.domain.entity.User;
 import br.com.sevenheads.userService.domain.repository.UserRepository;
+import br.com.sevenheads.userService.utility.cohere.CohereIARequest;
+import br.com.sevenheads.userService.utility.cohere.CohereIAResponse;
 import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -24,6 +26,8 @@ public class UtilityController {
     private final BackblazeService backblazeService;
 
     private final UserRepository userRepository;
+
+    private final CohereService cohereService;
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadPhoto(@RequestHeader("Authorization") String authorizationHeader, @RequestParam("file") MultipartFile file) {
@@ -143,4 +147,25 @@ public class UtilityController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    @PostMapping("/ia")
+    public ResponseEntity<CohereIAResponse> callPromptCohere (@RequestBody CohereIARequest request) {
+        try {
+            CohereIAResponse response = cohereService.callPromptCohere(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CohereIAResponse(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/prompt")
+    public ResponseEntity<String> callPromptCohere (@RequestBody String message) {
+        try {
+            String response = cohereService.callPromptSimplyfiedCohere(message, null);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 }
